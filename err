@@ -1,0 +1,27 @@
+Microsoft Windows [Version 10.0.17763.9020]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Users\Administrator>D:
+
+D:\>cd D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918
+
+D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918>dotnet clean
+  VoicebotBillingMIS failed with 1 error(s) (0.0s)
+    D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918\VoicebotBillingMIS\VoicebotBillingMIS.csproj(179,3): error MSB4019: The imported project "C:\Program Files\dotnet\sdk\9.0.308\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets" was not found. Confirm that the expression in the Import declaration "$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets", which evaluated to "C:\Program Files\dotnet\sdk\9.0.308\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets", is correct, and that the file exists on disk.
+
+Build failed with 1 error(s) in 0.7s
+
+D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918>dotnet build
+Restore complete (0.9s)
+  VoicebotBillingMIS failed with 1 error(s) (0.0s)
+    D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918\VoicebotBillingMIS\VoicebotBillingMIS.csproj(179,3): error MSB4019: The imported project "C:\Program Files\dotnet\sdk\9.0.308\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets" was not found. Confirm that the expression in the Import declaration "$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets", which evaluated to "C:\Program Files\dotnet\sdk\9.0.308\Microsoft\VisualStudio\v17.0\WebApplications\Microsoft.WebApplication.targets", is correct, and that the file exists on disk.
+  VoicebotBillingMIS.Data succeeded with 5 warning(s) (1.5s) → VoicebotBillingMIS.Data\bin\Debug\net48\VoicebotBillingMIS.Data.dll
+    D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918\VoicebotBillingMIS.Data\Compatibility\DateOnlyJsonConverter.cs(17,28): warning CS8765: Nullability of type of parameter 'existingValue' doesn't match overridden member (possibly because of nullability attributes).
+    D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918\VoicebotBillingMIS.Data\Compatibility\DateOnlyJsonConverter.cs(69,26): warning CS8765: Nullability of type of parameter 'value' doesn't match overridden member (possibly because of nullability attributes).
+    D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918\VoicebotBillingMIS.Data\Compatibility\DateOnlyJsonConverter.cs(27,24): warning CS8603: Possible null reference return.
+    D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918\VoicebotBillingMIS.Data\Compatibility\DateOnlyJsonConverter.cs(45,24): warning CS8603: Possible null reference return.
+    D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918\VoicebotBillingMIS.Data\Services\InvoicePdfParsers.cs(168,37): warning CS8604: Possible null reference argument for parameter 'campaign' in 'ParsedInvoiceLine PdfParserBase.Line(string campaign, decimal mou)'.
+
+Build failed with 1 error(s) and 5 warning(s) in 2.6s
+
+D:\CSI_Applications\Piramal Winter Intern\Swarnadeep\Voicebot-billing-MIS-7.0-20260918>
