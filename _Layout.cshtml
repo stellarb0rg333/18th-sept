@@ -1,0 +1,85 @@
+@{
+    var displayName = "Local User";
+    if (User != null &&
+        User.Identity != null &&
+        User.Identity.IsAuthenticated)
+    {
+        displayName = User.Identity.Name ?? "User";
+    }
+
+    var email = "localuser@test.com";
+    if (User != null &&
+        User.Identity != null &&
+        User.Identity.IsAuthenticated)
+    {
+        email = User.Identity.Name ?? "localuser@test.com";
+    }
+
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - VoicebotBillingMIS</title>
+    <link rel="stylesheet" href="@Url.Content("~/Content/PageHeader.css")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/Usage.css?v=202609180120")" />
+    <link rel="stylesheet" href="@Url.Content("~/Content/Invoice.css?v=202609182239")" />
+</head>
+<body>
+    <div style="margin-bottom: 4.5rem;">
+        <header class="header">
+            <div class="header-left">
+                <a href="@Url.Action("Index", "Usage")" class="logo-container" title="Piramal Finance — Voicebot Billing MIS">
+                    <img src="https://upload.wikimedia.org/wikipedia/en/thumb/d/dc/Piramal_Finance_logo.svg/1280px-Piramal_Finance_logo.svg.png?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=thumbnail"
+                         class="logo logo-watermark"
+                         alt="Piramal Finance" />
+                </a>
+            </div>
+
+            <nav class="header-nav" aria-label="Main navigation">
+                <a href="@Url.Action("Index", "Usage")" class="header-nav-link" data-nav-link>Usage</a>
+                <a href="@Url.Action("Index", "CampaignBudget")" class="header-nav-link" data-nav-link>Campaign Budget</a>
+                <a href="@Url.Action("Index", "VendorRates")" class="header-nav-link" data-nav-link>Vendor Rates</a>
+                <a href="@Url.Action("Upload", "Invoice")" class="header-nav-link" data-nav-link>Invoice Upload</a>
+                <a href="@Url.Action("History", "Invoice")" class="header-nav-link" data-nav-link>Invoice History</a>
+                <a href="@Url.Action("MonthlyHistory", "Invoice")" class="header-nav-link" data-nav-link>Monthly History</a>
+            </nav>
+
+            <div class="header-right frameDiv">
+                <div class="avatarParent" id="headerAvatarMenu">
+                    <div class="employee-id-badge" aria-label="Employee ID @displayName">
+                        <span class="employee-id-value">@displayName</span>
+                        
+                    </div>
+                    <button type="button" class="icon4 menu-toggle-button" id="headerMenuButton" aria-haspopup="true" aria-expanded="false" aria-controls="headerDropdownMenu">
+                        <span class="icon5" aria-hidden="true">▾</span>
+                    </button>
+                    <div class="dropdownContent" id="headerDropdownMenu" hidden>
+                        <ul>
+                            <li class="logoutRow">
+                                @using (Html.BeginForm("Logout", "Account", FormMethod.Post, new { @class = "logout-form" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" data-logout-row>
+                                        <span class="logout-icon" aria-hidden="true">↪</span>
+                                        <span>Log out</span>
+                                    </button>
+                                }
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+
+    <main>
+        @RenderBody()
+    </main>
+
+    <script src="@Url.Content("~/Scripts/header.js")"></script>
+    <script src="@Url.Content("~/Scripts/multiselect.js")"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
