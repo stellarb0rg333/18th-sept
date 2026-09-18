@@ -289,7 +289,7 @@ public class InvoiceController : Controller
 
         try
         {
-            if (await _invoiceHistoryRepository.IsDuplicateAsync(history, cancellationToken))
+            if (await IsDuplicateInvoiceAsync(history, cancellationToken))
             {
                 var duplicateModel = await BuildUploadViewModelAsync(input, rows, cancellationToken);
                 duplicateModel.ErrorMessage =
@@ -460,7 +460,7 @@ public class InvoiceController : Controller
             return RedirectToAction(nameof(MonthlyHistory));
         }
 
-        var count = await _invoiceHistoryRepository.DeleteRowsForMonthAsync(year, month, cancellationToken);
+        var count = await DeleteRowsForMonthAsync(year, month, cancellationToken);
         TempData["InvoiceMonthlyMessage"] = count == 0
             ? "No reconciliation rows matched the selected month."
             : $"Deleted {count} reconciliation row(s) for {new DateTime(year, month, 1):MMMM yyyy}.";
@@ -509,6 +509,91 @@ public class InvoiceController : Controller
             .ThenBy(row => row.Vendor, StringComparer.OrdinalIgnoreCase)
             .ThenBy(row => row.BillCampaign, StringComparer.OrdinalIgnoreCase)
             .ToList();
+    }
+
+    private async Task<bool> IsDuplicateInvoiceAsync(
+        InvoiceHistoryRecord history,
+        CancellationToken cancellationToken)
+    {
+        var records = await _invoiceHistoryRepository.GetAllAsync(cancellationToken);
+        var expectedRows = history.Comparison?.ReconciliationRows;
+        return records.Any(existing =>
+            string.Equals(existing.VendorName, history.VendorName, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(
+                existing.Comparison?.Record?.OriginalFileName,
+                history.Comparison?.Record?.OriginalFileName,
+                StringComparison.OrdinalIgnoreCase) &&
+            SameReconciliationRows(existing.Comparison?.ReconciliationRows, expectedRows));
+    }
+
+    private async Task<int> DeleteRowsForMonthAsync(
+        int year,
+        int month,
+        CancellationToken cancellationToken)
+    {
+        var deletedRows = 0;
+        var records = await _invoiceHistoryRepository.GetAllAsync(cancellationToken);
+        foreach (var history in records)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var rows = history.Comparison?.ReconciliationRows;
+            if (rows == null || rows.Count == 0)
+            {
+                continue;
+            }
+
+            var remaining = rows.Where(row =>
+                !row.FromDate.HasValue ||
+                row.FromDate.Value.Year != year ||
+                row.FromDate.Value.Month != month).ToList();
+            if (remaining.Count == rows.Count)
+            {
+                continue;
+            }
+
+            deletedRows += rows.Count - remaining.Count;
+            history.Comparison.ReconciliationRows = remaining;
+            history.RowCount = remaining.Count;
+            if (remaining.Count == 0)
+            {
+                await _invoiceHistoryRepository.DeleteAsync(history.Id, cancellationToken);
+            }
+            else
+            {
+                await _invoiceHistoryRepository.SaveAsync(history, cancellationToken);
+            }
+        }
+
+        return deletedRows;
+    }
+
+    private static bool SameReconciliationRows(
+        IReadOnlyList<InvoiceReconciliationRow>? left,
+        IReadOnlyList<InvoiceReconciliationRow>? right)
+    {
+        if (left == null || right == null || left.Count != right.Count)
+        {
+            return false;
+        }
+
+        var leftKeys = left.Select(ReconciliationRowKey)
+            .OrderBy(key => key, StringComparer.Ordinal)
+            .ToList();
+        var rightKeys = right.Select(ReconciliationRowKey)
+            .OrderBy(key => key, StringComparer.Ordinal)
+            .ToList();
+        return leftKeys.SequenceEqual(rightKeys, StringComparer.Ordinal);
+    }
+
+    private static string ReconciliationRowKey(InvoiceReconciliationRow row)
+    {
+        return string.Join("|",
+            row.BillCampaignName ?? string.Empty,
+            row.BillMou?.ToString("G29", CultureInfo.InvariantCulture) ?? string.Empty,
+            row.InternalCampaignId?.ToString(CultureInfo.InvariantCulture) ?? string.Empty,
+            row.FromDate?.ToString("O", CultureInfo.InvariantCulture) ?? string.Empty,
+            row.ToDate?.ToString("O", CultureInfo.InvariantCulture) ?? string.Empty,
+            row.TrackedMou?.ToString("G29", CultureInfo.InvariantCulture) ?? string.Empty);
     }
 
     private async Task<ActionResult> RenderFetchResultAsync(
