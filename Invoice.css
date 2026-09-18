@@ -1,0 +1,877 @@
+/* ── Invoice pages ─────────────────────────────────────────── */
+
+/*
+Invoice pages intentionally reuse the shared visual language
+established by Usage.css.
+*/
+
+.invoice-card {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0.75rem 0 0.01rem;
+}
+
+
+/* ── Upload form ───────────────────────────────────────────── */
+
+.invoice-upload-grid {
+    grid-template-columns: 1.05fr 1fr 1fr 1fr 1.45fr 1.45fr;
+    gap: 16px;
+}
+
+.invoice-select,
+.invoice-file-input {
+    width: 100%;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 6px;
+    padding: 0.5rem 0.625rem;
+    color: var(--gray-700);
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+    .invoice-select:hover,
+    .invoice-file-input:hover {
+        border-color: var(--gray-400);
+    }
+
+    .invoice-select:focus,
+    .invoice-file-input:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+.invoice-file-field {
+    justify-content: flex-end;
+}
+
+.invoice-upload-grid .voicebot-filter-actions {
+    width: 100%;
+    align-self: end;
+}
+
+.invoice-upload-grid .invoice-upload-button {
+    width: 100%;
+}
+
+.invoice-rate-field {
+    display: none;
+}
+
+.invoice-fetch-button {
+    color: #fff;
+    background: #2563eb;
+    border: 1px solid #1d4ed8;
+    border-radius: 5px;
+    padding: 0.4rem 0.65rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+    .invoice-fetch-button:hover {
+        background: #1d4ed8;
+    }
+
+.invoice-row-error {
+    color: #9f1239;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    font-weight: 600;
+    text-align: left !important;
+}
+
+.invoice-save-button {
+    width: auto !important;
+    margin: 1rem 0;
+}
+
+.invoice-row-delete-button {
+    border: 0;
+    background: transparent;
+    color: #b91c1c;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.monthly-history-filter {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: end;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.monthly-history-filter .voicebot-filter-field {
+    width: 100%;
+    min-width: 0;
+}
+
+.monthly-history-filter .voicebot-filter-field > span {
+    display: block;
+    font-weight: 600;
+    margin-bottom: .35rem;
+}
+
+.monthly-history-filter .invoice-select {
+    width: 100%;
+    min-width: 0;
+}
+
+.monthly-history-view-button {
+    width: 100%;
+    height: 2.35rem;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+@media (max-width: 700px) {
+    .monthly-history-filter {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.monthly-history-table {
+    min-width: 1050px;
+}
+
+.monthly-history-table tfoot th {
+    font-weight: 700;
+    background: #f8fafc;
+}
+
+.monthly-history-delete-form {
+    margin-top: 1rem;
+    text-align: right;
+}
+
+    .invoice-save-button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+    }
+
+.invoice-reconciliation-card {
+    margin-top: 1rem;
+}
+
+.invoice-upload-rows-table th:nth-child(3),
+.invoice-upload-rows-table td:nth-child(3) {
+    width: auto;
+}
+
+.invoice-upload-rows-table th:nth-child(2),
+.invoice-upload-rows-table td:nth-child(2) {
+    width: 15%;
+}
+
+.invoice-upload-rows-table th:nth-child(4),
+.invoice-upload-rows-table td:nth-child(4),
+.invoice-upload-rows-table th:nth-child(5),
+.invoice-upload-rows-table td:nth-child(5) {
+    width: 155px;
+    min-width: 155px;
+    max-width: 155px;
+}
+
+.invoice-upload-rows-table td:nth-child(4) input[type="datetime-local"],
+.invoice-upload-rows-table td:nth-child(5) input[type="datetime-local"] {
+    width: 100%;
+    min-width: 0;
+    padding-left: 0.25rem;
+    padding-right: 0.15rem;
+}
+
+.invoice-upload-rows-table td:nth-child(4) input[type="datetime-local"]::-webkit-datetime-edit,
+.invoice-upload-rows-table td:nth-child(5) input[type="datetime-local"]::-webkit-datetime-edit,
+.invoice-upload-rows-table td:nth-child(4) input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper,
+.invoice-upload-rows-table td:nth-child(5) input[type="datetime-local"]::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+}
+
+.invoice-upload-rows-table td:nth-child(4) input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.invoice-upload-rows-table td:nth-child(5) input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    margin-left: 0;
+    padding: 0;
+}
+
+.invoice-upload-rows-wrapper {
+    overflow-x: hidden;
+}
+
+.invoice-upload-rows-table {
+    min-width: 0;
+    width: 100%;
+}
+
+
+/* ── Invoice buttons ───────────────────────────────────────── */
+
+.invoice-upload-button {
+    width: 100%;
+    color: #fff;
+    background: #2563eb;
+    border: none;
+    border-radius: 6px;
+    padding: 0.6rem 1.25rem;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.875rem;
+    letter-spacing: 0.02em;
+    box-shadow: 0 1px 4px rgba(37, 99, 235, 0.28);
+    transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+    .invoice-upload-button:hover {
+        background: #1d4ed8;
+        box-shadow: 0 3px 8px rgba(37, 99, 235, 0.38);
+        transform: translateY(-1px);
+    }
+
+    .invoice-upload-button:active {
+        background: #1e40af;
+        transform: translateY(0);
+        box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+    }
+
+
+/* ── Summary ───────────────────────────────────────────────── */
+
+.invoice-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.6rem;
+    margin: 1rem 0 1.25rem;
+    padding: 1rem;
+    background: #fff8f5;
+    border: 1px solid #f5dfd5;
+    border-radius: 8px;
+}
+
+.invoice-summary-item {
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid #e8edf5;
+    border-radius: 8px;
+    padding: 0.65rem 0.75rem;
+    color: var(--gray-700);
+    font-size: 0.85rem;
+}
+
+    .invoice-summary-item strong {
+        display: block;
+        margin-bottom: 0.2rem;
+        color: var(--gray-600);
+        font-size: 0.68rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+    }
+
+
+/* ── Evidence / information box ───────────────────────────── */
+
+.invoice-evidence-box {
+    margin: 0 0 1.25rem;
+    padding: 1rem;
+    background: #fff8f5;
+    border: 1px solid #f5dfd5;
+    border-radius: 8px;
+    color: var(--gray-700);
+}
+
+
+/* ── Alerts ────────────────────────────────────────────────── */
+
+.invoice-alert {
+    margin-bottom: 1rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.invoice-alert-error {
+    background: #fff1f2;
+    color: #9f1239;
+    border: 1px solid #fecdd3;
+}
+
+.invoice-alert-info {
+    background: #eff6ff;
+    color: #1e40af;
+    border: 1px solid #bfdbfe;
+}
+
+
+/* ── Tables ────────────────────────────────────────────────── */
+
+.invoice-table-wrap {
+    margin-top: 1rem;
+    overflow-x: hidden;
+}
+
+.invoice-table-wrap table {
+    width: 100%;
+}
+
+.invoice-history-table {
+    table-layout: auto !important;
+}
+
+.invoice-history-table .invoice-history-col-date {
+    width: 14%;
+}
+
+.invoice-history-table .invoice-history-col-vendor {
+    width: 9%;
+}
+
+.invoice-history-table .invoice-history-col-pdf {
+    width: 39% !important;
+}
+
+.invoice-history-table .invoice-history-col-rate {
+    width: 9%;
+}
+
+.invoice-history-table .invoice-history-col-rows {
+    width: 5%;
+}
+
+.invoice-history-table .invoice-history-col-created-by {
+    width: 14% !important;
+    min-width: 8rem;
+}
+
+.invoice-history-table .invoice-history-col-action {
+    width: max-content;
+}
+
+.invoice-history-table th:nth-child(7),
+.invoice-history-table td:nth-child(7),
+.invoice-history-table th:nth-child(8),
+.invoice-history-table td:nth-child(8) {
+    width: 1% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    white-space: nowrap;
+}
+
+.invoice-history-table td:nth-child(7) .invoice-link-button,
+.invoice-history-table td:nth-child(8) .invoice-link-button {
+    max-width: 100%;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    white-space: nowrap;
+}
+
+.invoice-history-table tbody td:nth-child(-n+6) {
+    font-size: 0.75rem !important;
+}
+
+/* Invoice History uses one normal table grid; do not inherit the Usage table's
+   split header/body layout. */
+.invoice-table-wrap table.invoice-history-table {
+    table-layout: auto !important;
+}
+
+.invoice-table-wrap table.invoice-history-table thead {
+    display: table-header-group !important;
+}
+
+.invoice-table-wrap table.invoice-history-table tbody {
+    display: table-row-group !important;
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+.invoice-table-wrap table.invoice-history-table thead tr,
+.invoice-table-wrap table.invoice-history-table tbody tr {
+    display: table-row !important;
+    width: auto !important;
+    table-layout: auto !important;
+}
+
+.invoice-table-wrap table.invoice-history-table th,
+.invoice-table-wrap table.invoice-history-table td {
+    box-sizing: border-box;
+}
+
+.invoice-table-wrap table.invoice-history-table th {
+    white-space: nowrap !important;
+    overflow-wrap: normal;
+    word-break: normal;
+    line-height: 1.15;
+}
+
+.invoice-table-wrap table.invoice-history-table th:nth-child(7),
+.invoice-table-wrap table.invoice-history-table td:nth-child(7),
+.invoice-table-wrap table.invoice-history-table th:nth-child(8),
+.invoice-table-wrap table.invoice-history-table td:nth-child(8) {
+    width: 1% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+}
+
+.invoice-table-wrap table.invoice-history-table th:nth-child(6),
+.invoice-table-wrap table.invoice-history-table td:nth-child(6) {
+    width: 14% !important;
+    min-width: 8rem !important;
+}
+
+.voicebot-empty-row {
+    text-align: center !important;
+    vertical-align: middle;
+}
+
+.invoice-table-wrap tbody tr.invoice-empty-row {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.invoice-table-wrap tbody tr.invoice-empty-row td.voicebot-empty-row {
+    width: 100%;
+    text-align: center !important;
+}
+
+
+    /* ── Invoice History table ─────────────────────────────────── */
+
+    .invoice-table-wrap table th,
+    .invoice-table-wrap table td {
+        text-align: center;
+        vertical-align: middle;
+        padding-top: 0.35rem;
+        padding-bottom: 0.35rem;
+    }
+
+    .invoice-table-wrap table.invoice-history-table th,
+    .invoice-table-wrap table.invoice-history-table td {
+        text-align: center !important;
+        vertical-align: middle;
+    }
+
+
+/* ── Invoice results layout ────────────────────────────────── */
+
+.invoice-results-layout {
+    display: grid;
+    grid-template-columns: 3fr 2fr;
+    gap: 1rem;
+    align-items: stretch;
+    margin-top: 1rem;
+}
+
+.invoice-comparison-panel,
+.invoice-pdf-panel {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ── Invoice comparison table ──────────────────────────────── */
+
+.invoice-comparison-table-wrapper {
+    width: 100%;
+    flex: 1;
+    overflow-x: hidden;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.invoice-comparison-table {
+    width: 100%;
+    min-width: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 15px;
+    table-layout: auto;
+}
+
+    .invoice-comparison-table thead tr {
+        background: transparent;
+    }
+
+    .invoice-comparison-table th {
+        background: #609dbf;
+        color: #000000;
+        padding: 0.32rem 0.1rem;
+        text-align: center;
+        font-weight: 600;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        /*
+        Keep headers on one line so the browser can determine
+        their natural intrinsic width.
+        */
+        white-space: nowrap;
+        overflow-wrap: normal;
+        word-break: normal;
+        border: none;
+        line-height: 1.15;
+    }
+
+        .invoice-comparison-table th:not(:last-child) {
+            border-right: 1px solid #fff;
+        }
+
+    .invoice-comparison-table td {
+        padding: 0.35rem 0.3rem;
+        color: var(--gray-700);
+        border-bottom: 1px solid var(--gray-200);
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        /*
+        Normal wrapping for regular data cells.
+        */
+        white-space: normal;
+        overflow-wrap: break-word;
+        word-break: normal;
+        vertical-align: middle;
+        line-height: 1.15;
+    }
+
+
+/*
+Bill Campaign column.
+
+Keep the campaign value on a single line.
+The column is allowed to become as wide as its content
+requires, while the other columns retain their natural
+intrinsic widths.
+*/
+.invoice-upload-rows-table th:nth-child(1),
+.invoice-upload-rows-table td:nth-child(1) {
+    white-space: nowrap;
+    width: 1%;
+}
+
+
+/*
+From Date and To Date.
+
+Keep both date columns on a single line and make them
+narrower than the other compact columns.
+*/
+.invoice-upload-rows-table th:nth-child(2),
+.invoice-upload-rows-table td:nth-child(2),
+.invoice-upload-rows-table th:nth-child(3),
+.invoice-upload-rows-table td:nth-child(3) {
+    width: 7%;
+    white-space: nowrap;
+}
+
+
+    /*
+Reduce the internal spacing inside the From Date
+and To Date datetime controls, especially the space
+between AM/PM and the calendar icon.
+*/
+    .invoice-upload-rows-table td:nth-child(2) input,
+    .invoice-upload-rows-table td:nth-child(3) input {
+        padding-left: 0.2rem;
+        padding-right: 0;
+        letter-spacing: -0.03em;
+    }
+
+        .invoice-upload-rows-table td:nth-child(2) input::-webkit-calendar-picker-indicator,
+        .invoice-upload-rows-table td:nth-child(3) input::-webkit-calendar-picker-indicator {
+            margin-left: -0.2rem;
+            margin-right: -0.15rem;
+            padding: 0;
+        }
+
+
+/*
+Keep the remaining compact column compact.
+*/
+.invoice-upload-rows-table th:nth-child(4),
+.invoice-upload-rows-table td:nth-child(4) {
+    white-space: nowrap;
+}
+
+
+/*
+Remove the previous percentage sizing from the
+remaining Extracted Invoice Rows columns.
+
+The browser determines their widths from the
+actual content/header sizes.
+*/
+.invoice-upload-rows-table th:nth-child(5),
+.invoice-upload-rows-table td:nth-child(5) {
+    width: auto;
+}
+
+
+/* ── Existing comparison-table compact columns ─────────────── */
+
+.invoice-comparison-table th:nth-child(2),
+.invoice-comparison-table td:nth-child(2),
+.invoice-comparison-table th:nth-child(6),
+.invoice-comparison-table td:nth-child(6) {
+    width: 7%;
+    white-space: nowrap;
+}
+
+.invoice-comparison-table tbody tr:nth-child(even) {
+    background: rgba(255, 244, 239, 0.38);
+}
+
+.invoice-comparison-table tbody tr:hover {
+    background: rgba(255, 228, 214, 0.78);
+}
+
+.invoice-comparison-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ── Numeric columns ───────────────────────────────────────── */
+
+.invoice-comparison-table td:nth-child(3),
+.invoice-comparison-table td:nth-child(4),
+.invoice-comparison-table td:nth-child(5),
+.invoice-comparison-table td:nth-child(6),
+.invoice-comparison-table td:nth-child(7),
+.invoice-comparison-table td:nth-child(8) {
+    text-align: center;
+}
+
+/* Invoice Upload order: Bill MOU sits immediately before Tracked MOU. */
+.invoice-upload-rows-table th:nth-child(2),
+.invoice-upload-rows-table td:nth-child(2) {
+    width: auto;
+}
+
+.invoice-upload-rows-table th:nth-child(3),
+.invoice-upload-rows-table td:nth-child(3),
+.invoice-upload-rows-table th:nth-child(4),
+.invoice-upload-rows-table td:nth-child(4) {
+    width: 170px;
+    min-width: 170px;
+    max-width: 170px;
+    white-space: nowrap;
+}
+
+.invoice-upload-rows-table th:nth-child(4),
+.invoice-upload-rows-table td:nth-child(4) {
+    width: 185px;
+    min-width: 185px;
+    max-width: 185px;
+}
+
+.invoice-upload-rows-table th:nth-child(5),
+.invoice-upload-rows-table td:nth-child(5) {
+    width: auto;
+}
+
+.invoice-upload-rows-table th:nth-child(5),
+.invoice-upload-rows-table td:nth-child(5) {
+    width: 1%;
+    min-width: 0;
+    max-width: max-content;
+    white-space: nowrap;
+}
+
+.invoice-upload-rows-table th:nth-child(5) {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.invoice-upload-rows-table td:nth-child(5) {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+}
+
+.invoice-upload-rows-table td:nth-child(5) form {
+    display: inline-block;
+    width: auto;
+    margin: 0;
+}
+
+.invoice-upload-rows-table th:nth-child(5) .invoice-fetch-button,
+.invoice-upload-rows-table td:nth-child(5) .invoice-fetch-button {
+    width: auto;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.invoice-upload-rows-table th:nth-child(6),
+.invoice-upload-rows-table td:nth-child(6) {
+    width: 1%;
+    min-width: 0;
+    max-width: max-content;
+    white-space: nowrap;
+}
+
+.invoice-upload-rows-table td:nth-child(3) input[type="datetime-local"],
+.invoice-upload-rows-table td:nth-child(4) input[type="datetime-local"] {
+    width: 100%;
+    min-width: 0;
+    padding-left: 0.25rem;
+    padding-right: 0.15rem;
+}
+
+.invoice-upload-rows-table td:nth-child(3) input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.invoice-upload-rows-table td:nth-child(4) input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    padding: 0.2rem 0.25rem 0.2rem 0.1rem;
+    margin: 0;
+}
+
+/* ── Link buttons ──────────────────────────────────────────── */
+
+.invoice-link-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 600;
+    font-size: 0.875rem;
+    line-height: 1.2;
+    border: 1px solid #bfdbfe;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+}
+
+    .invoice-link-button:hover {
+        background: #dbeafe;
+        transform: translateY(-1px);
+    }
+
+.invoice-delete-button {
+    background: #dc2626;
+    border-color: #b91c1c;
+    color: #fff;
+}
+
+    .invoice-delete-button:hover {
+        background: #b91c1c;
+        border-color: #b91c1c;
+    }
+
+
+/* ── PDF viewer ────────────────────────────────────────────── */
+
+.invoice-pdf-viewer {
+    width: 100%;
+    height: 70vh;
+    min-height: 500px;
+    flex: 1;
+    margin: 0;
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #f5f5f5;
+    box-shadow: var(--shadow-sm);
+}
+
+    .invoice-pdf-viewer iframe {
+        display: block;
+        width: 100%;
+        height: 100%;
+        border: 0;
+    }
+
+
+/* ── Responsive ────────────────────────────────────────────── */
+
+@media (max-width: 1100px) {
+    .invoice-results-layout {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+
+    .invoice-comparison-panel,
+    .invoice-pdf-panel {
+        display: block;
+    }
+
+    .invoice-pdf-viewer {
+        height: 75vh;
+        min-height: 500px;
+    }
+}
+
+@media (max-width: 900px) {
+    .invoice-upload-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .invoice-upload-button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .invoice-pdf-viewer {
+        height: 65vh;
+    }
+
+    .invoice-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Make the delete button match the same visual size/style as View */
+    .invoice-delete-button {
+        background: #d32f2f;
+        border: none;
+        color: #ffffff;
+        box-shadow: none;
+    }
+
+        .invoice-delete-button:hover {
+            background: #b71c1c;
+            border: none;
+        }
+}
+
+
+/* ── Global table styling ──────────────────────────────────── */
+
+/*
+All tables across the application use the same:
+- Black text
+- Light blue column headers
+- 17px header text
+- 15px table content
+*/
+
+table th,
+table td {
+    color: #000000 !important;
+}
+
+table {
+    table-layout: auto;
+}
+
+    table th {
+        background-color: rgba(176, 216, 232, 0.88) !important;
+        font-size: 11px !important;
+        font-weight: 600 !important;
+    }
+
+    table td {
+        font-size: 14px !important;
+    }
+
+    /* Apply the same subtle blue hover tint to every table body row. */
+    table tbody tr:hover {
+        background: rgba(255, 228, 214, 0.78) !important;
+    }
