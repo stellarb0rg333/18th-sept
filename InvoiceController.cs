@@ -74,9 +74,15 @@ public class InvoiceController : Controller
 
         try
         {
-            input.OriginalFileName = Path.GetFileName(input.InvoicePdf!.FileName);
+            var uploadedPdf = input.InvoicePdf;
+            if (uploadedPdf == null)
+            {
+                throw new InvalidDataException("The uploaded PDF content is unavailable.");
+            }
+
+            input.OriginalFileName = Path.GetFileName(uploadedPdf.FileName);
             var parser = _invoicePdfParserFactory.Create(input.VendorName!);
-            using var uploadStream = input.InvoicePdf.InputStream;
+            using var uploadStream = uploadedPdf.InputStream;
             using var pdfBuffer = new MemoryStream();
             uploadStream.CopyTo(pdfBuffer);
             var pdfBytes = pdfBuffer.ToArray();
@@ -244,11 +250,12 @@ public class InvoiceController : Controller
         var now = DateTime.UtcNow;
         var snapshotRows = rows.Select((row, index) => new InvoiceReconciliationRow
         {
+            // ValidateInvoiceForSave has already required this value.
             RowIndex = index,
             BillCampaignName = row.BillCampaign,
             BillMou = row.BillMou,
             InternalCampaignId = row.InternalCampaignId,
-            InternalCampaignName = selectedCampaigns[row.InternalCampaignId!.Value].Name,
+            InternalCampaignName = selectedCampaigns[row.InternalCampaignId.GetValueOrDefault()].Name,
             FromDate = row.FromDate,
             ToDate = row.ToDate,
             TrackedMou = row.TrackedMou,
@@ -416,8 +423,9 @@ public class InvoiceController : Controller
     {
         var records = await _invoiceHistoryRepository.GetAllAsync(cancellationToken);
         var availableYears = records.SelectMany(record => record.Comparison?.ReconciliationRows ?? Array.Empty<InvoiceReconciliationRow>())
-            .Where(row => row.FromDate.HasValue)
-            .Select(row => row.FromDate.Value.Year)
+            .Select(row => row.FromDate)
+            .Where(date => date.HasValue)
+            .Select(date => date.Value.Year)
             .Distinct()
             .OrderByDescending(value => value)
             .ToList();
@@ -593,9 +601,14 @@ public class InvoiceController : Controller
             {
                 errors.Add($"Row {index + 1} requires both dates.");
             }
-            else if (row.FromDate.Value > row.ToDate.Value)
+            else
             {
-                errors.Add($"Row {index + 1} has From Date after To Date.");
+                var rowFromDate = row.FromDate.Value;
+                var rowToDate = row.ToDate.Value;
+                if (rowFromDate > rowToDate)
+                {
+                    errors.Add($"Row {index + 1} has From Date after To Date.");
+                }
             }
             if (!row.TrackedMou.HasValue || !row.CostDifference.HasValue)
             {
