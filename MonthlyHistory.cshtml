@@ -1,0 +1,98 @@
+@model VoicebotBillingMIS.Models.MonthlyHistoryViewModel
+@using System
+@{
+    ViewData["Title"] = "Monthly History";
+}
+<div class="voicebot-page-shell">
+    <main class="voicebot-page-content">
+        <section class="voicebot-card invoice-card">
+            @if (!string.IsNullOrWhiteSpace(Model.Message))
+            {
+                <div class="invoice-alert invoice-alert-info">@Model.Message</div>
+            }
+            <form method="get"
+                  action="@Url.Action("MonthlyHistory", "Invoice")"
+                  class="voicebot-filter-grid monthly-history-filter">
+                <div class="voicebot-filter-field voicebot-filter-field-compact">
+                    <span>
+                        <label for="monthly-history-month">Month</label>
+                    </span>
+                    <select id="monthly-history-month" name="month" class="invoice-select">
+                        @for (var month = 1; month <= 12; month++)
+                        {
+                            <option value="@month" selected="@(month == Model.Month ? "selected" : null)">
+                                @(new DateTime(2000, month, 1).ToString("MMMM"))
+                            </option>
+                        }
+                    </select>
+                </div>
+                <div class="voicebot-filter-field voicebot-filter-field-compact">
+                    <span>
+                        <label for="monthly-history-year">Year</label>
+                    </span>
+                    <select id="monthly-history-year" name="year" class="invoice-select">
+                        @foreach (var year in Model.Years)
+                        {
+                            <option value="@year" selected="@(year == Model.Year ? "selected" : null)">@year</option>
+                        }
+                    </select>
+                </div>
+                <div class="voicebot-filter-actions">
+                    <button type="submit" class="invoice-upload-button monthly-history-view-button">View</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="invoice-reconciliation-card">
+            <div class="invoice-table-wrap">
+                <table class="invoice-history-table monthly-history-table">
+                    <thead>
+                        <tr>
+                            <th>From date</th><th>To date</th><th>Vendor</th><th>₹/min</th>
+                            <th>Bill campaign</th><th>Bill MOU</th><th>Tracked MOU</th>
+                            <th>Bill cost</th><th>Tracked cost</th><th>Difference</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model.Rows.Count == 0)
+                    {
+                        <tr><td colspan="10" class="voicebot-empty-row">No reconciliation rows found for this month.</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var row in Model.Rows)
+                        {
+                            <tr>
+                                <td>@(row.FromDate.HasValue ? row.FromDate.Value.ToString("dd-MMM-yyyy") : "—")</td>
+                                <td>@(row.ToDate.HasValue ? row.ToDate.Value.ToString("dd-MMM-yyyy") : "—")</td>
+                                <td>@row.Vendor</td><td>₹@row.Rate.ToString("N2")</td>
+                                <td>@row.BillCampaign</td><td>@row.BillMou.ToString("N2")</td>
+                                <td>@(row.TrackedMou.HasValue ? row.TrackedMou.Value.ToString("N2") : "—")</td>
+                                <td>₹@row.BillCost.ToString("N2")</td>
+                                <td>@(row.TrackedCost.HasValue ? "₹" + row.TrackedCost.Value.ToString("N2") : "—")</td>
+                                <td>@(row.Difference.HasValue ? "₹" + row.Difference.Value.ToString("N2") : "—")</td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="7">Totals</th>
+                            <th>₹@Model.TotalBillCost.ToString("N2")</th>
+                            <th>₹@Model.TotalTrackedCost.ToString("N2")</th>
+                            <th>—</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <form method="post" action="@Url.Action("DeleteMonthlyHistory", "Invoice")"
+                  class="monthly-history-delete-form"
+                  onsubmit="return confirm('Delete only reconciliation rows matching this month?');">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="year" value="@Model.Year" />
+                <input type="hidden" name="month" value="@Model.Month" />
+                <button type="submit" class="invoice-link-button invoice-delete-button">Delete selected month</button>
+            </form>
+        </section>
+    </main>
+</div>
