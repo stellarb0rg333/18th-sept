@@ -1,0 +1,440 @@
+@model VoicebotBillingMIS.Models.InvoiceUploadPageViewModel
+@using System
+@{
+    ViewData["Title"] = "Invoice Upload";
+}
+
+<style>
+    .invoice-upload-form {
+        width: 100%;
+        max-width: none;
+        box-sizing: border-box;
+        grid-template-columns: 1fr;
+    }
+
+    .invoice-upload-grid {
+        display: grid;
+        width: 100%;
+        max-width: none;
+        grid-template-columns: 0.85fr 0.7fr 0.7fr 0.7fr 2fr 0.9fr;
+        gap: 0.45rem;
+        align-items: end;
+    }
+
+    .invoice-upload-grid > .campaign-budget-field,
+    .invoice-upload-grid > .voicebot-filter-actions {
+        width: 100%;
+        min-width: 0;
+        max-width: none;
+        box-sizing: border-box;
+    }
+
+    .invoice-upload-grid .invoice-file-input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .invoice-upload-grid .invoice-upload-button {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    @@media (max-width: 1100px) {
+        .invoice-upload-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+    }
+
+    @@media (max-width: 700px) {
+        .invoice-upload-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="voicebot-page-shell">
+    <main class="voicebot-page-content"
+          data-invoice-message="@Model.Message"
+          data-invoice-message-type="@(string.IsNullOrWhiteSpace(Model.ErrorMessage) ? "success" : "error")">
+        <section class="voicebot-card invoice-card">
+            @if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+            {
+                <div class="invoice-alert invoice-alert-error">@Model.ErrorMessage</div>
+            }
+
+            <form method="post" enctype="multipart/form-data" class="campaign-budget-form invoice-upload-form">
+                @Html.AntiForgeryToken()
+
+                <div class="voicebot-filters-grid invoice-upload-grid">
+                    <div class="campaign-budget-field">
+                        <label for="VendorName">Vendor Name</label>
+                        <select id="VendorName" name="VendorName" class="invoice-select" required>
+                            <option value="">Select vendor</option>
+                            @foreach (var vendor in Model.VendorNames)
+                            {
+                                var isSelected = string.Equals(
+                                    Model.Input.VendorName,
+                                    vendor,
+                                    StringComparison.OrdinalIgnoreCase);
+
+                                <option value="@vendor" selected="@(isSelected ? "selected" : null)">
+                                    @vendor
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="campaign-budget-field">
+                        <label for="FogteamsRatePerMinute">Fogteams ₹/min</label>
+                        <input id="FogteamsRatePerMinute"
+                               name="FogteamsRatePerMinute"
+                               type="number"
+                               class="invoice-select"
+                               min="0.01"
+                               step="0.01"
+                               required
+                               value="@(Model.Input.FogteamsRatePerMinute.HasValue
+                                   ? Model.Input.FogteamsRatePerMinute.Value.ToString("N2")
+                                   : string.Empty)" />
+                    </div>
+
+                    <div class="campaign-budget-field">
+                        <label for="GreylabsRatePerMinute">Greylabs ₹/min</label>
+                        <input id="GreylabsRatePerMinute"
+                               name="GreylabsRatePerMinute"
+                               type="number"
+                               class="invoice-select"
+                               min="0.01"
+                               step="0.01"
+                               required
+                               value="@(Model.Input.GreylabsRatePerMinute.HasValue
+                                   ? Model.Input.GreylabsRatePerMinute.Value.ToString("N2")
+                                   : string.Empty)" />
+                    </div>
+
+                    <div class="campaign-budget-field">
+                        <label for="GnaniRatePerMinute">Gnani ₹/min</label>
+                        <input id="GnaniRatePerMinute"
+                               name="GnaniRatePerMinute"
+                               type="number"
+                               class="invoice-select"
+                               min="0.01"
+                               step="0.01"
+                               required
+                               value="@(Model.Input.GnaniRatePerMinute.HasValue
+                                   ? Model.Input.GnaniRatePerMinute.Value.ToString("N2")
+                                   : string.Empty)" />
+                    </div>
+
+                    <div class="campaign-budget-field invoice-file-field">
+                        <label for="InvoicePdf">Invoice PDF</label>
+                        <input id="InvoicePdf"
+                               name="InvoicePdf"
+                               type="file"
+                               class="invoice-file-input"
+                               accept=".pdf,application/pdf"
+                               required />
+                    </div>
+
+                    <div class="voicebot-filter-actions">
+                        <button type="submit" class="invoice-upload-button">
+                            Upload
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <script>
+                (function () {
+                    var vendor = document.getElementById("VendorName");
+
+                    var rates = {
+                        Fogteams: "3.10",
+                        Greylabs: "2.75",
+                        Gnani: "3.00"
+                    };
+
+                    var rateInputs = {
+                        Fogteams: document.getElementById("FogteamsRatePerMinute"),
+                        Greylabs: document.getElementById("GreylabsRatePerMinute"),
+                        Gnani: document.getElementById("GnaniRatePerMinute")
+                    };
+
+                    vendor.addEventListener("change", function () {
+                        var rate = rates[vendor.value];
+                        var input = rateInputs[vendor.value];
+
+                        if (rate && input) {
+                            input.value = rate;
+                        }
+                    });
+                }());
+            </script>
+        </section>
+
+        @if (Model.Rows.Count > 0)
+            {
+                <div class="invoice-reconciliation-card">
+                    <h2></h2>
+
+                    <div class="invoice-comparison-table-wrapper invoice-upload-rows-wrapper">
+                        <table class="invoice-comparison-table invoice-upload-rows-table">
+                            <thead>
+                                <tr>
+                                    <th>Bill Campaign</th>
+                                    <th>Campaign</th>
+                                    <th>From Date</th>
+                                    <th>To Date</th>
+                                    <th>Fetch</th>
+                                    <th>Bill MOU</th>
+                                    <th>Tracked MOU</th>
+                                    <th>Cost Diff</th>
+                                    <th aria-label="Remove"></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @for (var rowIndex = 0; rowIndex < Model.Rows.Count; rowIndex++)
+                                {
+                                    var row = Model.Rows[rowIndex];
+                                    var fetchFormId = "fetch-row-" + rowIndex;
+
+                                    <tr>
+                                        <td>@row.BillCampaign</td>
+
+                                        <td>
+                                            <select class="invoice-select"
+                                                    name="internalCampaignId"
+                                                    form="@fetchFormId">
+                                                <option value="">Select internal campaign</option>
+
+                                                @foreach (var campaign in Model.Campaigns)
+                                                {
+                                                    var isSelected =
+                                                        row.InternalCampaignId.HasValue &&
+                                                        row.InternalCampaignId.Value == campaign.Id;
+
+                                                    <option value="@campaign.Id"
+                                                            selected="@(isSelected ? "selected" : null)">
+                                                        @campaign.Name
+                                                    </option>
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="datetime-local"
+                                                   class="invoice-select"
+                                                   name="fromDate"
+                                                   form="@fetchFormId"
+                                                   value="@(row.FromDate.HasValue
+                                                       ? row.FromDate.Value.ToString("yyyy-MM-ddTHH:mm")
+                                                       : string.Empty)" />
+                                        </td>
+
+                                        <td>
+                                            <input type="datetime-local"
+                                                   class="invoice-select"
+                                                   name="toDate"
+                                                   form="@fetchFormId"
+                                                   value="@(row.ToDate.HasValue
+                                                       ? row.ToDate.Value.ToString("yyyy-MM-ddTHH:mm")
+                                                       : string.Empty)" />
+                                        </td>
+
+                                        <td>
+                                            <form id="@fetchFormId"
+                                                  class="invoice-fetch-form"
+                                                  method="post"
+                                                  action="@Url.Action("FetchRow", "Invoice")">
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="rowIndex"
+                                                       value="@rowIndex" />
+
+                                                <button type="submit"
+                                                        class="invoice-fetch-button">
+                                                    Fetch
+                                                </button>
+                                            </form>
+                                        </td>
+
+                                        <td>@row.BillMou.ToString("N2")</td>
+
+                                        <td>
+                                            @(row.TrackedMou.HasValue
+                                                ? row.TrackedMou.Value.ToString("N0")
+                                                : "—")
+                                        </td>
+
+                                        <td>
+                                            @if (row.CostDifference.HasValue)
+                                            {
+                                                var difference = row.CostDifference.Value;
+
+                                                if (difference > 0)
+                                                {
+                                                    <text>+₹@difference.ToString("N2")</text>
+                                                }
+                                                else if (difference < 0)
+                                                {
+                                                    <text>-₹@Math.Abs(difference).ToString("N2")</text>
+                                                }
+                                                else
+                                                {
+                                                    <text>₹0.00</text>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <text>—</text>
+                                            }
+                                        </td>
+                                        <td>
+                                            <form method="post"
+                                                  action="@Url.Action("RemoveRow", "Invoice")"
+                                                  onsubmit="return confirm('Remove this invoice row?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="rowIndex" value="@rowIndex" />
+                                                <button type="submit"
+                                                        class="invoice-row-delete-button"
+                                                        title="Remove row"
+                                                        aria-label="Remove row">×</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+
+                                    if (!string.IsNullOrWhiteSpace(row.ErrorMessage))
+                                    {
+                                        <tr>
+                                            <td colspan="9" class="invoice-row-error">
+                                                @row.ErrorMessage
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="invoice-reconciliation-card">
+                    <h2></h2>
+
+                    <div class="invoice-pdf-viewer">
+                        <iframe src="@Url.RouteUrl("InvoicePreviewPdf")#view=FitH"
+                                title="Uploaded invoice PDF preview">
+                        </iframe>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Rows.Count > 0)
+            {
+                <form method="post"
+                      action="@Url.Action("SaveInvoice", "Invoice")"
+                      class="invoice-save-form">
+                    @Html.AntiForgeryToken()
+
+                    <button type="submit"
+                            class="invoice-upload-button invoice-save-button">
+                        Save Invoice
+                    </button>
+                </form>
+            }
+            else
+            {
+                
+            }
+    </main>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            'use strict';
+
+            function ensureNotificationHost() {
+                var host = document.querySelector('.usage-notification-host');
+                if (host) {
+                    return host;
+                }
+
+                host = document.createElement('div');
+                host.className = 'usage-notification-host';
+                document.body.appendChild(host);
+                return host;
+            }
+
+            function showNotification(message, type, autoDismiss) {
+                var host = ensureNotificationHost();
+                var toast = document.createElement('div');
+                var text = document.createElement('span');
+                var closeButton = document.createElement('button');
+
+                toast.className = 'usage-notification usage-notification-' + type;
+                toast.setAttribute('role', 'alert');
+                text.className = 'usage-notification-text';
+                text.textContent = message;
+                closeButton.type = 'button';
+                closeButton.className = 'usage-notification-close';
+                closeButton.setAttribute('aria-label', 'Close notification');
+                closeButton.textContent = '×';
+                toast.appendChild(text);
+                toast.appendChild(closeButton);
+                host.appendChild(toast);
+
+                function dismissToast() {
+                    if (!toast.isConnected) {
+                        return;
+                    }
+
+                    toast.classList.add('is-hiding');
+                    window.setTimeout(function () {
+                        toast.remove();
+                    }, 250);
+                }
+
+                closeButton.addEventListener('click', dismissToast);
+                if (autoDismiss !== false) {
+                    window.setTimeout(dismissToast, 5000);
+                }
+            }
+
+            document.querySelectorAll('.invoice-fetch-form').forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    var formSelector = '[form="' + form.id + '"]';
+                    var campaign = document.querySelector(
+                        '[name="internalCampaignId"]' + formSelector);
+                    var fromDate = document.querySelector(
+                        '[name="fromDate"]' + formSelector);
+                    var toDate = document.querySelector(
+                        '[name="toDate"]' + formSelector);
+
+                    if (!campaign || !campaign.value ||
+                        !fromDate || !fromDate.value ||
+                        !toDate || !toDate.value) {
+                        event.preventDefault();
+                        showNotification(
+                            'Please fill in Campaign, From Date, and To Date before fetching.',
+                            'error');
+                        return;
+                    }
+
+                    event.preventDefault();
+                    showNotification('Fetching..', 'fetching', false);
+                    window.setTimeout(function () {
+                        HTMLFormElement.prototype.submit.call(form);
+                    }, 50);
+                });
+            });
+
+            var message = document.querySelector('[data-invoice-message]');
+            if (message && message.dataset.invoiceMessage) {
+                showNotification(
+                    message.dataset.invoiceMessage,
+                    message.dataset.invoiceMessageType || 'success');
+            }
+        }());
+    </script>
+}
